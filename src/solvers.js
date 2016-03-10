@@ -18,23 +18,23 @@
 window.findNRooksSolution = function(n, check) {
   var board = new Board({n: n});
   var counter = 0;
-  // var curRow = [];
-  // var start = start || 0; 
 
   var findAllSolutions = function (board, rowIndex) {
     for (var colIndex = 0; colIndex < n; colIndex++) {
-      // debugger;
       board.togglePiece(rowIndex, colIndex);
 
       if (!board.hasAnyRooksConflicts()) {
         // base case
         if (rowIndex === (n - 1)) {
-          // debugger;
-          counter++;
-          return board; // KEEP EYE ON
+          if (check) {
+            counter++;
+            board.togglePiece(rowIndex, colIndex);
+          } else {
+            return board; // for finding a single solution
+          }
         } else {
-          rowIndex++;
-          var result = findAllSolutions(board, rowIndex);
+          var nextRow = rowIndex + 1;
+          var result = findAllSolutions(board, nextRow);
           if (result) {
             return result;
           } else {
@@ -57,30 +57,6 @@ window.findNRooksSolution = function(n, check) {
     return solution.rows();
   }
 
-
-  
-  // for (var rowIndex = 0; rowIndex < n; rowIndex++) {
-  //   var curRow = [];
-  //   for (var colIndex = 0; colIndex < n; colIndex++) {
-  //     if (rowIndex === 0 && colIndex === start) {
-  //       curRow[colIndex] = 1;
-  //       board.set(rowIndex, curRow);
-  //     } else {
-  //       curRow[colIndex] = 1;
-  //       board.set(rowIndex, curRow);
-  //       if (board.hasAnyRooksConflicts()) {
-  //         curRow[colIndex] = 0;
-  //         board.set(rowIndex, curRow);
-  //       } 
-  //     }
-  //   }
-  //   // EDGE CASE: what happens if curRow only has 0 values? 
-  // }
-
-  // solution = board.rows();
-
-  // console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  // return solution;
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
@@ -92,17 +68,68 @@ window.countNRooksSolutions = function(n) {
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
-window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+window.findNQueensSolution = function(n, check) {
+  var board = new Board({n: n});
+  var counter = 0;
+  // debugger;
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  // for single solution:
+  if (n === 0) {
+    return [];
+  } else if (n === 2 || n === 3) {
+    return board.rows();
+  }
+
+  // for check true:
+
+
+  var findAllSolutions = function (board, rowIndex) {
+    for (var colIndex = 0; colIndex < n; colIndex++) {
+      board.togglePiece(rowIndex, colIndex);
+
+      if (!board.hasAnyQueensConflicts()) {
+        // base case
+        if (rowIndex === (n - 1)) {
+          if (check) {
+            counter++;
+            board.togglePiece(rowIndex, colIndex);
+          } else {
+            return board; // for finding a single solution
+          }
+        } else {
+          var nextRow = rowIndex + 1;
+          var result = findAllSolutions(board, nextRow);
+          if (result) {
+            return result;
+          } else {
+            board.togglePiece(rowIndex, colIndex);
+          }
+        }
+      // if there are conflicts:  
+      } else {
+        board.togglePiece(rowIndex, colIndex);
+      }
+    }
+
+    return undefined;
+  };
+
+  var solution = findAllSolutions(board, 0);
+  if (check) {
+    return counter;
+  } else {
+    // debugger;
+    return solution.rows();
+  }
+
+  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  // return solution;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = findNQueensSolution(n, true);
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+  // console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
