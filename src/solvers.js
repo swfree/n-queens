@@ -73,12 +73,22 @@ window.findNQueensSolution = function(n, check) {
   var counter = 0;
   // debugger;
 
-  // for single solution:
-  if (n === 0) {
-    return [];
-  } else if (n === 2 || n === 3) {
-    return board.rows();
+  if (check) {
+    // return just the count for 0, 2, 3
+    if (n === 0) {
+      return 1;
+    } else if (n === 2 || n === 3) {
+      return 0;
+    }
+  } else {
+    // return the empty solution board
+    if (n === 0) {
+      return [];
+    } else if (n === 2 || n === 3) {
+      return board.rows();
+    }
   }
+  // for single solution:
 
   // for check true:
 
