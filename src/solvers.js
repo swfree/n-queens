@@ -15,53 +15,79 @@
 
 
 
-window.findNRooksSolution = function(n, start) {
-  var solution = []; 
-  var curRow = [];
-  var start = start || 0; 
-
+window.findNRooksSolution = function(n, check) {
   var board = new Board({n: n});
-  
-  for (var rowIndex = 0; rowIndex < n; rowIndex++) {
-    var curRow = [];
+  var counter = 0;
+  // var curRow = [];
+  // var start = start || 0; 
+
+  var findAllSolutions = function (board, rowIndex) {
     for (var colIndex = 0; colIndex < n; colIndex++) {
-      if (rowIndex === 0 && colIndex === start) {
-        curRow[colIndex] = 1;
-        board.set(rowIndex, curRow);
+      // debugger;
+      board.togglePiece(rowIndex, colIndex);
+
+      if (!board.hasAnyRooksConflicts()) {
+        // base case
+        if (rowIndex === (n - 1)) {
+          // debugger;
+          counter++;
+          return board; // KEEP EYE ON
+        } else {
+          rowIndex++;
+          var result = findAllSolutions(board, rowIndex);
+          if (result) {
+            return result;
+          } else {
+            board.togglePiece(rowIndex, colIndex);
+          }
+        }
+      // if there are conflicts:  
       } else {
-        curRow[colIndex] = 1;
-        board.set(rowIndex, curRow);
-        if (board.hasAnyRooksConflicts()) {
-          curRow[colIndex] = 0;
-          board.set(rowIndex, curRow);
-        } 
+        board.togglePiece(rowIndex, colIndex);
       }
     }
-    // EDGE CASE: what happens if curRow only has 0 values? 
+
+    return undefined;
+  };
+
+  var solution = findAllSolutions(board, 0);
+  if (check) {
+    return counter;
+  } else {
+    return solution.rows();
   }
 
-  solution = board.rows();
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solution;
+  
+  // for (var rowIndex = 0; rowIndex < n; rowIndex++) {
+  //   var curRow = [];
+  //   for (var colIndex = 0; colIndex < n; colIndex++) {
+  //     if (rowIndex === 0 && colIndex === start) {
+  //       curRow[colIndex] = 1;
+  //       board.set(rowIndex, curRow);
+  //     } else {
+  //       curRow[colIndex] = 1;
+  //       board.set(rowIndex, curRow);
+  //       if (board.hasAnyRooksConflicts()) {
+  //         curRow[colIndex] = 0;
+  //         board.set(rowIndex, curRow);
+  //       } 
+  //     }
+  //   }
+  //   // EDGE CASE: what happens if curRow only has 0 values? 
+  // }
+
+  // solution = board.rows();
+
+  // console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
+  // return solution;
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = 0;
-  var solutions = [];
+  var solutionCount = findNRooksSolution(n, true);
 
-  for (var i = 0; i < n; i++) {
-    solutions.push(window.findNRooksSolution(n, i));
-  }
-
-  // we'll call findNRooksSolution n times
-    // passing in a new column index each time
-    // count every time we get a truthy return value
-
-  solutionCount = solutions.length;
-
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
 
