@@ -15,21 +15,32 @@
 
 
 
-window.findNRooksSolution = function(n) {
-  var solution = []; //fixme
+window.findNRooksSolution = function(n, start) {
+  var solution = []; 
+  var curRow = [];
+  var start = start || 0; 
+
+  var board = new Board({n: n});
   
-  for (var i = 0; i < n; i++) {
+  for (var rowIndex = 0; rowIndex < n; rowIndex++) {
     var curRow = [];
-    for (var j = 0; j < n; j++) {
-      if (i === j) {
-        curRow.push(1);
+    for (var colIndex = 0; colIndex < n; colIndex++) {
+      if (rowIndex === 0 && colIndex === start) {
+        curRow[colIndex] = 1;
+        board.set(rowIndex, curRow);
       } else {
-        curRow.push(0);
+        curRow[colIndex] = 1;
+        board.set(rowIndex, curRow);
+        if (board.hasAnyRooksConflicts()) {
+          curRow[colIndex] = 0;
+          board.set(rowIndex, curRow);
+        } 
       }
     }
-    solution.push(curRow);
+    // EDGE CASE: what happens if curRow only has 0 values? 
   }
 
+  solution = board.rows();
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
@@ -37,7 +48,18 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0;
+  var solutions = [];
+
+  for (var i = 0; i < n; i++) {
+    solutions.push(window.findNRooksSolution(n, i));
+  }
+
+  // we'll call findNRooksSolution n times
+    // passing in a new column index each time
+    // count every time we get a truthy return value
+
+  solutionCount = solutions.length;
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
